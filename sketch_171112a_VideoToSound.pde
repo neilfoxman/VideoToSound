@@ -10,7 +10,7 @@ SinOsc sine;
 // 16:9 aspect ratio https://www.digitalcitizen.life/what-screen-resolution-or-aspect-ratio-what-do-720p-1080i-1080p-mean
 final int ASP_WIDTH = 16;
 final int ASP_HEIGHT = 9;
-final int ASP_SCALE = 50;
+final int ASP_SCALE = 70;
 final int FRAME_SINGLE_WIDTH = ASP_WIDTH * ASP_SCALE;
 final int FRAME_SINGLE_HEIGHT = ASP_HEIGHT * ASP_SCALE;
 
@@ -31,6 +31,7 @@ void setup() {
   // Set video playback params
   video.loop();
   video.volume(0);
+  //video.speed(0.1);
   video.play();
   
 }
@@ -44,28 +45,54 @@ void draw()
     // Get frame from video and resize
     PImage orig = video.get(0,0, video.width, video.height); // https://forum.processing.org/one/topic/how-to-make-images-from-a-video.html
     orig.resize(FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
-    //image(orig,0,0);
+    image(orig, 0, 0);
     
     //  load into opencv object
     opencv.loadImage(orig);
-    //PImage origCV = opencv.getSnapshot();
-    //image(origCV, 0, 0);
+    //dispCurrent();
     
     // Perform background subtraction
     opencv.updateBackground();
-    PImage bgsub = opencv.getSnapshot();
-    image(bgsub, 0, 0);
+    //dispCurrent();
+    
+    // Perform erosion
+    opencv.erode();
+    dispCurrent();
+    
+    // Get and display Contours
+    ArrayList<Contour> contours;
+    contours = opencv.findContours();
+    stroke(255, 0, 0);
+    fill(0, 0); 
+    for (Contour contour : contours) // For each contour
+    {
+      
+      // Offset location to "After" Side and draw points
+      ArrayList<PVector> ptsToDraw = contour.getPoints();
+      beginShape();
+      for(PVector pt : ptsToDraw)
+      {
+        vertex(pt.x + FRAME_SINGLE_WIDTH, pt.y);
+      }
+      endShape();
+      
+    }
+    
+    
 
   }
-  
-  
-
-
-  
   
 }
 
 // Called every time a new frame is available to read
 void movieEvent(Movie m) {
   m.read();
+}
+
+
+
+void dispCurrent()
+{
+  PImage current = opencv.getSnapshot();
+  image(current, FRAME_SINGLE_WIDTH, 0);
 }
