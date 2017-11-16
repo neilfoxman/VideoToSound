@@ -10,7 +10,7 @@ SinOsc sine;
 // 16:9 aspect ratio https://www.digitalcitizen.life/what-screen-resolution-or-aspect-ratio-what-do-720p-1080i-1080p-mean
 final int ASP_WIDTH = 16;
 final int ASP_HEIGHT = 9;
-final int ASP_SCALE = 30;
+final int ASP_SCALE = 50;
 final int FRAME_SINGLE_WIDTH = ASP_WIDTH * ASP_SCALE;
 final int FRAME_SINGLE_HEIGHT = ASP_HEIGHT * ASP_SCALE;
 
@@ -28,8 +28,9 @@ void setup() {
   // Call background subtraction tracking
   opencv.startBackgroundSubtraction(5,3,0.5);
   
-  // Set video playback
+  // Set video playback params
   video.loop();
+  video.volume(0);
   video.play();
   
 }
@@ -41,22 +42,24 @@ void draw()
   if(video.width > 0 && video.height > 0)
   {
     // Get frame from video and resize
-    PImage orig = video.get(0,0, video.width, video.height);
+    PImage orig = video.get(0,0, video.width, video.height); // https://forum.processing.org/one/topic/how-to-make-images-from-a-video.html
     orig.resize(FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
-    image(orig,0,0);
+    //image(orig,0,0);
     
+    //  load into opencv object
+    opencv.loadImage(orig);
+    //PImage origCV = opencv.getSnapshot();
+    //image(origCV, 0, 0);
     
-    
-    
-    //opencv.loadImage(video);
-    //PImage original = opencv.getSnapshot();
-    //println(original.width + " " + original.height);
-    //image(original, 0, 0, width, height);
+    // Perform background subtraction
+    opencv.updateBackground();
+    PImage bgsub = opencv.getSnapshot();
+    image(bgsub, 0, 0);
 
   }
   
   
-  //opencv.updateBackground();
+
 
   
   
