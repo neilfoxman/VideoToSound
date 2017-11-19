@@ -1,12 +1,12 @@
-
 import processing.video.*;
 import processing.sound.*;
 import gab.opencv.*;
+import java.awt.Rectangle;
 //import blobscanner.*;
 
 Movie video;
-OpenCV opencv;
-Histogram grayHist;
+//OpenCV opencv;
+//Histogram grayHist;
 SinOsc sine;
 
 // 16:9 aspect ratio https://www.digitalcitizen.life/what-screen-resolution-or-aspect-ratio-what-do-720p-1080i-1080p-mean
@@ -16,14 +16,8 @@ final int ASP_SCALE = 40;
 final int FRAME_SINGLE_WIDTH = ASP_WIDTH * ASP_SCALE;
 final int FRAME_SINGLE_HEIGHT = ASP_HEIGHT * ASP_SCALE;
 
-//// Adaptive Thresholding Constants
-////int thresholdBlockSize = 489;
-////int thresholdConstant = 45;
-//int thresholdBlockSize = 29;
-//int thresholdConstant = 60;
-
 // Fixed Threshold parameters
-int lightThreshold = 250;
+int lightThreshold = 240;
 
 // Store previous images for flicker reduction
 ArrayList<PImage> prevImages = new ArrayList<PImage>();
@@ -38,22 +32,7 @@ void setup() {
   
   // Create manipulation objects for movie and opencv
   video = new Movie(this, "2017_1114_184929_016.MOV");
-  opencv = new OpenCV(this, FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
-  
-  //// Call background subtraction tracking
-  //opencv.startBackgroundSubtraction(5,3,0.5);
-  
-  //// Thresholding block size must be odd and greater than 3
-  //if (thresholdBlockSize%2 == 0)
-  //{
-  //  thresholdBlockSize++;
-  //  println("thresholdBlockSize adjusted to " + thresholdBlockSize);
-  //}
-  //if (thresholdBlockSize < 3)
-  //{
-  //  thresholdBlockSize = 3;
-  //  println("thresholdBlockSize adjusted to " + thresholdBlockSize);
-  //}
+  //opencv = new OpenCV(this, FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
   
   
   // Set video playback params
@@ -75,36 +54,20 @@ void draw()
     orig.resize(FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
     image(orig, 0, 0);
     
-    //  load into opencv object
-    opencv.loadImage(orig);
-    //dispCurrent();
-    
-    //// Perform adaptive thresholding
-    //opencv.adaptiveThreshold(thresholdBlockSize, thresholdConstant);
-    //opencv.invert();
-    //dispCurrent();
-    
-    //// Get Histogam (and display)
-    //grayHist = opencv.findHistogram(opencv.getGray(), 256);
-    //fill(255,0,0);
-    //noStroke();
-    //grayHist.draw(320, 10, 310, 180);
-    
+    // Make modifiable image
+    PImage modImg = orig.copy();
+        
     // Perform thresholding
-    opencv.threshold(240);
-    //dispCurrent();
-    
-    //// Perform background subtraction
-    //opencv.updateBackground();
-    ////dispCurrent();
+    modImg.filter(THRESHOLD, (float)lightThreshold/255);
+    //dispCurrent(modImg);
     
     // Perform erosion
-    opencv.erode();
-    //dispCurrent();
+    modImg.filter(ERODE);
+    //dispCurrent(modImg);
     
     // Perform Dilation
-    opencv.dilate();
-    dispCurrent();
+    modImg.filter(DILATE);
+    dispCurrent(modImg);
     
     
     //// Get and display Contours
@@ -126,6 +89,9 @@ void draw()
       
     //}
     
+    ////  load into opencv object
+    //opencv.loadImage(orig);
+    ////dispCurrent();
     
 
   }
@@ -139,24 +105,32 @@ void movieEvent(Movie m) {
 
 
 
-void dispCurrent()
+void dispCurrent(PImage current)
 {
-  PImage current = opencv.getSnapshot();
+  //PImage current = opencv.getSnapshot();
   image(current, FRAME_SINGLE_WIDTH, 0);
 }
 
-void removeFlicker()
-{
-  int numImagesForFlickerReduction = 3;
+//PImage removeFlicker(PImage newImg, int numImagesForFlickerReduction)
+//{
+//  // Add new imgae to ArrayList of Images for flicker analysis
+//  prevImages.add(newImg);
   
-  prevImages.add(opencv.getSnapshot());
-  if(prevImages.size() > numImagesForFlickerReduction)
-  {
-    prevImages.remove(0);
-  }
+//  // Chop off oldest image(s) 
+//  while(prevImages.size() > numImagesForFlickerReduction)
+//  {
+//    prevImages.remove(0);
+//  }
   
-  PImage dum = new PImage(1080, 800);
-  (127);
+//  for(PImage img : prevImages)
+//  {
+//    // start going thru the pixels
+//    // once a pixel is > 0
+//      //check if 
+//  }
   
   
-}
+//  return(retImg);
+  
+  
+//}
