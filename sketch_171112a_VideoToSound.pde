@@ -1,3 +1,4 @@
+import java.util.*;
 import processing.video.*;
 import processing.sound.*;
 import gab.opencv.*;
@@ -19,8 +20,8 @@ final int FRAME_SINGLE_HEIGHT = ASP_HEIGHT * ASP_SCALE;
 // Fixed Threshold parameters
 int lightThreshold = 240;
 
-// Store previous images for flicker reduction
-ArrayList<PImage> prevImages = new ArrayList<PImage>();
+// Blob tracker
+BlobTracker blobTracker;
 
 
 
@@ -30,8 +31,9 @@ void setup() {
   size(640, 480); // initial
   surface.setSize(FRAME_SINGLE_WIDTH * 2, FRAME_SINGLE_HEIGHT); // programatic resize requires this
   
-  // Create manipulation objects for movie and opencv
+  // Create manipulation objects
   video = new Movie(this, "2017_1114_184929_016.MOV");
+  blobTracker = new BlobTracker(this);
   //opencv = new OpenCV(this, FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
   
   
@@ -69,29 +71,12 @@ void draw()
     modImg.filter(DILATE);
     dispCurrent(modImg);
     
+    // Run Blob tracking
+    blobTracker.runTracker(modImg);
     
-    //// Get and display Contours
-    //ArrayList<Contour> contours;
-    //contours = opencv.findContours();
-    //stroke(255, 0, 0);
-    //fill(0, 0); 
-    //for (Contour contour : contours) // For each contour
-    //{
-      
-    //  // Offset location to "After" Side and draw points
-    //  ArrayList<PVector> ptsToDraw = contour.getPoints();
-    //  beginShape();
-    //  for(PVector pt : ptsToDraw)
-    //  {
-    //    vertex(pt.x + FRAME_SINGLE_WIDTH, pt.y);
-    //  }
-    //  endShape();
-      
-    //}
     
     ////  load into opencv object
-    //opencv.loadImage(orig);
-    ////dispCurrent();
+    //opencv.loadImage(modImg);
     
 
   }
@@ -110,27 +95,3 @@ void dispCurrent(PImage current)
   //PImage current = opencv.getSnapshot();
   image(current, FRAME_SINGLE_WIDTH, 0);
 }
-
-//PImage removeFlicker(PImage newImg, int numImagesForFlickerReduction)
-//{
-//  // Add new imgae to ArrayList of Images for flicker analysis
-//  prevImages.add(newImg);
-  
-//  // Chop off oldest image(s) 
-//  while(prevImages.size() > numImagesForFlickerReduction)
-//  {
-//    prevImages.remove(0);
-//  }
-  
-//  for(PImage img : prevImages)
-//  {
-//    // start going thru the pixels
-//    // once a pixel is > 0
-//      //check if 
-//  }
-  
-  
-//  return(retImg);
-  
-  
-//}
