@@ -3,6 +3,7 @@ class BlobTracker
   private PApplet parent;
   private int idCounter;
   private ArrayList<Blob> oldBlobs, newBlobs;
+  private PImage img;
   private OpenCV opencv;
   private int trackDistanceThreshold = 500;
 
@@ -20,8 +21,11 @@ class BlobTracker
     this.trackDistanceThreshold = threshold;
   }
 
-  public void runTracker(PImage img)
+  public void runTracker(PImage _img)
   {
+    // Load Image into Tracker
+    this.img = _img;
+    
     // Find all contours in image
     this.opencv.loadImage(img);
     ArrayList<Contour> contours = opencv.findContours(true, true);
@@ -34,19 +38,10 @@ class BlobTracker
       this.newBlobs.add(newBlob);
     }
 
-    // If no existing old blob list
-    if (this.oldBlobs.isEmpty())
-    {
-      // Go thru each new blob
-      for (Blob newBlob : newBlobs)
-      {
-        // assign the final id as the temp id
-        newBlob.finalId = newBlob.tempId;
 
-        // add the blob to the old blob list
-        this.oldBlobs.add(newBlob);
-      }
-    } else // If we have old blobs
+
+    // If we have tracked old blobs
+    if (!this.oldBlobs.isEmpty())
     {
       //println("size: " + oldBlobs.size() + "  counter: " + this.idCounter);
 
@@ -59,40 +54,54 @@ class BlobTracker
         //if (oldBlob.closestBlobDist == null && oldBlob.closestBlobDist > trackDistanceThreshold)//  if distance < threshold
         //{
         //  // get closest newblob tempId
-          
+
         //}
       }
 
       //Determine closest old blob to each new blob
-      for(Blob newBlob : this.newBlobs) //For each new blob
+      for (Blob newBlob : this.newBlobs) //For each new blob
       {
         //  get closest oldBlob distance
         newBlob.calculateClosestBlob(this.oldBlobs);
         //  if distance < the=reshold
         //    get closest oldBlob final id
       }
-      
-      
+
+
       //determine matching blob - check that closest blob to new blob and closest blob to old blob match:
-      for(Blob inspectedOldBlob : this.oldBlobs) // inspect each old blob
+      for (Blob inspectedOldBlob : this.oldBlobs) // inspect each old blob
       {
         //  get closest newblob to inspected oldblob
         Blob closestNewBlob = inspectedOldBlob.closestBlob;
-        
+
         //  get closest oldblob to closest newblob to inspected oldBlob
         Blob closestOldBlob_closestNewBlob = closestNewBlob.closestBlob;
-        
-        //  if inspected oldBlob is the closest oldBlob to its closest NewBlob
-        if(inspectedOldBlob.finalId == closestOldBlob_closestNewBlob.finalId)
+
+        //  if inspected oldBlob is the closest oldBlob to its closest newBlob
+        if (inspectedOldBlob.finalId == closestOldBlob_closestNewBlob.finalId)
         {
-          // Assign the newblob the same final id as the inspected and closest oldBlob
-          closestNewBlob.finalId = inspectedOldBlob.finalId;
+          // if distance is less than threshold
+          if (inspectedOldBlob.closestBlobDist < trackDistanceThreshold)
+          {
+            // Assign the newblob the same final id as the inspected and closest oldBlob
+            closestNewBlob.finalId = inspectedOldBlob.finalId;
+          }
         }
       }
-      
-      
-      
     }
+
+    // clear oldBlob List as tracking operations are complete
+    this.oldBlobs.clear();
+
+    // Assign a final id to all remaining newBlobs and copy them to the oldBlob List:
+    for(Blob newBlob : this.newBlobs)// for each newBlob
+    {
+      if(newBlob.finalId < 0)// if the newBlob does not have a finalId
+      {
+        newBlob.finalId = newBlob.tempId;// copy its tempId to its finalId
+      }
+      this.oldBlobs.add(newBlob);// add each newBlob to the List of OldBlobs
+    } 
   }
 
   public ArrayList<Blob> getBlobs()
@@ -100,20 +109,4 @@ class BlobTracker
     return(newBlobs);
   }
   
-  // looks up a newblob by temp id and assigns it a new final id
-  //  returns true if set, returns false if not found
-  private boolean setNewBlobFinalId(int _tempId, int _finalId)
-  {
-    boolean ret = false;
-    for(Blob newBlob : newBlobs)
-    {
-      if(newBlob.tempId == _tempId)
-      {
-        newBlob.finalId = _finalId;
-        ret = true;
-      }
-    }
-    
-    return(ret);
-  }
 }

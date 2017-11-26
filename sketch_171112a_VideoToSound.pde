@@ -69,14 +69,14 @@ void draw()
     
     // Perform Dilation
     modImg.filter(DILATE);
-    dispCurrent(modImg);
+    //dispCurrent(modImg);
     
     // Run Blob tracking
     blobTracker.runTracker(modImg);
     
-    
-    ////  load into opencv object
-    //opencv.loadImage(modImg);
+    // Draw blob identifiers
+    dispCurrent(modImg);
+    drawBlobsInPostFrame();
     
 
   }
@@ -94,4 +94,13 @@ void dispCurrent(PImage current)
 {
   //PImage current = opencv.getSnapshot();
   image(current, FRAME_SINGLE_WIDTH, 0);
+}
+
+void drawBlobsInPostFrame()
+{
+  ArrayList<Blob> arrayOfBlobs = blobTracker.getBlobs();
+  for(Blob blob : arrayOfBlobs)
+  {
+    text(blob.finalId, blob.x + FRAME_SINGLE_WIDTH, blob.y); 
+  }  
 }
