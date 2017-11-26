@@ -23,64 +23,66 @@ int lightThreshold = 240;
 // Blob tracker
 BlobTracker blobTracker;
 
+// Movie frame
+int frame = 0;
+
 
 
 void setup() {
-  
+
   // Set size
   size(640, 480); // initial
   surface.setSize(FRAME_SINGLE_WIDTH * 2, FRAME_SINGLE_HEIGHT); // programatic resize requires this
-  
+
   // Create manipulation objects
   video = new Movie(this, "2017_1114_184929_016.MOV");
   blobTracker = new BlobTracker(this);
   //opencv = new OpenCV(this, FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
-  
-  
+
+
   // Set video playback params
   video.loop();
   video.volume(0);
   //video.speed(0.1);
   video.play();
-  
+  //video.jump(frame);
+  //video.pause();
 }
 
 void draw()
 {
+  background(127);
   //image(video, 0, 0, width, height);
 
-  if(video.width > 0 && video.height > 0)
+  if (video.width > 0 && video.height > 0)
   {
     // Get frame from video and resize
-    PImage orig = video.get(0,0, video.width, video.height); // https://forum.processing.org/one/topic/how-to-make-images-from-a-video.html
+    PImage orig = video.get(0, 0, video.width, video.height); // https://forum.processing.org/one/topic/how-to-make-images-from-a-video.html
     orig.resize(FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
     image(orig, 0, 0);
-    
+
     // Make modifiable image
     PImage modImg = orig.copy();
-        
+
     // Perform thresholding
     modImg.filter(THRESHOLD, (float)lightThreshold/255);
     //dispCurrent(modImg);
-    
+
     // Perform erosion
     modImg.filter(ERODE);
     //dispCurrent(modImg);
-    
+
     // Perform Dilation
     modImg.filter(DILATE);
     //dispCurrent(modImg);
-    
+
     // Run Blob tracking
     blobTracker.runTracker(modImg);
-    
+
     // Draw blob identifiers
     dispCurrent(modImg);
     drawBlobsInPostFrame();
-    
-
   }
-  
 }
 
 // Called every time a new frame is available to read
@@ -99,8 +101,15 @@ void dispCurrent(PImage current)
 void drawBlobsInPostFrame()
 {
   ArrayList<Blob> arrayOfBlobs = blobTracker.getBlobs();
-  for(Blob blob : arrayOfBlobs)
+  for (Blob blob : arrayOfBlobs)
   {
-    text(blob.finalId, blob.x + FRAME_SINGLE_WIDTH, blob.y); 
-  }  
+    text(blob.finalId, blob.x + FRAME_SINGLE_WIDTH, blob.y);
+  }
+}
+
+void mousePressed()
+{
+  //video.play();
+  //video.jump(++frame);
+  //video.pause();
 }

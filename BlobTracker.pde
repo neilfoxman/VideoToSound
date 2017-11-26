@@ -31,6 +31,7 @@ class BlobTracker
     ArrayList<Contour> contours = opencv.findContours(true, true);
 
     // Convert each contour to a blob and add each blob to new blob list
+    this.newBlobs.clear();
     for (Contour contour : contours)
     {
       Blob newBlob = new Blob(this.parent, contour);
@@ -101,11 +102,13 @@ class BlobTracker
         newBlob.finalId = newBlob.tempId;// copy its tempId to its finalId
       }
       this.oldBlobs.add(newBlob);// add each newBlob to the List of OldBlobs
-    } 
+    }
+    
   }
 
   public ArrayList<Blob> getBlobs()
   {
+    println(newBlobs.size());
     return(newBlobs);
   }
   
