@@ -5,7 +5,7 @@ class BlobTracker
   private ArrayList<Blob> oldBlobs, newBlobs;
   private PImage img;
   private OpenCV opencv;
-  private int trackDistanceThreshold = 500;
+  private int trackDistanceThreshold = 50;
 
   public BlobTracker(PApplet _parent)
   {
@@ -51,12 +51,6 @@ class BlobTracker
       {
         //  get closest newBlob distance
         oldBlob.calculateClosestBlob(this.newBlobs);
-
-        //if (oldBlob.closestBlobDist == null && oldBlob.closestBlobDist > trackDistanceThreshold)//  if distance < threshold
-        //{
-        //  // get closest newblob tempId
-
-        //}
       }
 
       //Determine closest old blob to each new blob
@@ -64,8 +58,6 @@ class BlobTracker
       {
         //  get closest oldBlob distance
         newBlob.calculateClosestBlob(this.oldBlobs);
-        //  if distance < the=reshold
-        //    get closest oldBlob final id
       }
 
 
@@ -86,6 +78,7 @@ class BlobTracker
           {
             // Assign the newblob the same final id as the inspected and closest oldBlob
             closestNewBlob.finalId = inspectedOldBlob.finalId;
+            //println("closestNewBlob "+closestNewBlob.finalId+"  inspectedOldBlob:"+inspectedOldBlob.finalId);
           }
         }
       }
@@ -108,7 +101,6 @@ class BlobTracker
 
   public ArrayList<Blob> getBlobs()
   {
-    println(newBlobs.size());
     return(newBlobs);
   }
   

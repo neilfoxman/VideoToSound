@@ -23,9 +23,9 @@ int lightThreshold = 240;
 // Blob tracker
 BlobTracker blobTracker;
 
-// Movie frame
-int frame = 0;
-
+// Movie navigation
+float fRate = 30; // frames/sec
+float fInt = 1/fRate; // Interval of frame (s)
 
 
 void setup() {
@@ -42,6 +42,7 @@ void setup() {
 
   // Set video playback params
   video.loop();
+  video.frameRate(fRate);
   video.volume(0);
   //video.speed(0.1);
   video.play();
@@ -103,13 +104,14 @@ void drawBlobsInPostFrame()
   ArrayList<Blob> arrayOfBlobs = blobTracker.getBlobs();
   for (Blob blob : arrayOfBlobs)
   {
-    text(blob.finalId, blob.x + FRAME_SINGLE_WIDTH, blob.y);
+    text(blob.finalId+","+blob.x+ ","+blob.y, blob.x + FRAME_SINGLE_WIDTH, blob.y);
   }
 }
 
-void mousePressed()
-{
-  //video.play();
-  //video.jump(++frame);
-  //video.pause();
+void mousePressed() {
+  video.play(); // need to be playing to jump
+  float fr = video.time() + fInt;
+  video.jump(fr);
+  video.pause();
+  //println("jumped to " + video.time());
 }
