@@ -101,7 +101,7 @@ void dispCurrent(PImage current)
 
 void drawBlobsInPostFrame()
 {
-  ArrayList<Blob> arrayOfBlobs = blobTracker.getBlobs();
+  ArrayList<Blob> arrayOfBlobs = blobTracker.getNewBlobs();
   for (Blob blob : arrayOfBlobs)
   {
     text(blob.finalId+","+blob.x+ ","+blob.y, blob.x + FRAME_SINGLE_WIDTH, blob.y);

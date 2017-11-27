@@ -33,6 +33,8 @@ class Blob
   
   public void calculateClosestBlob(ArrayList<Blob> blobs)
   {
+    closestBlob = null; // clear previous close blobs
+    closestBlobDist = null; // clear previous distances
     distMap = new HashMap<Blob, Float>(2 * blobs.size());  // Oversize to avoid re-hashing
     for(Blob blob : blobs)
     {
