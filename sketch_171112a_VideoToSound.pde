@@ -3,7 +3,9 @@ import processing.video.*;
 import processing.sound.*;
 import gab.opencv.*;
 import java.awt.Rectangle;
-//import blobscanner.*;
+//import javax.sound.midi.*;
+import themidibus.*;
+
 
 Movie video;
 //OpenCV opencv;
@@ -27,6 +29,9 @@ BlobTracker blobTracker;
 float fRate = 30; // frames/sec
 float fInt = 1/fRate; // Interval of frame (s)
 
+// Music Making
+MusicMaker musicMaker;
+
 
 void setup() {
 
@@ -38,6 +43,7 @@ void setup() {
   video = new Movie(this, "2017_1114_184929_016.MOV");
   blobTracker = new BlobTracker(this);
   //opencv = new OpenCV(this, FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
+  musicMaker = new MusicMaker();
 
 
   // Set video playback params

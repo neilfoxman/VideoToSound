@@ -24,7 +24,7 @@ class BlobTracker
   public void runTracker(PImage _img)
   {
     
-    println("***********************************");
+    //println("***********************************");
     
     // Clear out old blobs
     this.oldBlobs.clear();
@@ -106,7 +106,7 @@ class BlobTracker
       }
     }
     
-    println(); //<>//
+    //println(); //<>//
     
   }
 
