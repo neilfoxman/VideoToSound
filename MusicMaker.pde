@@ -9,7 +9,7 @@ class MusicMaker
   public final ArrayList<Integer> SCALE_MAJOR = new ArrayList(Arrays.asList(0, 2, 4, 5, 7, 9, 11));
   public final ArrayList<Integer> SCALE_MINOR = new ArrayList(Arrays.asList(0, 2, 3, 5, 7, 8, 10));
   public final ArrayList<Integer> SCALE_SIMPLE = new ArrayList(Arrays.asList(0, 2, 5, 7));
-  private ArrayList<XRange> xRanges = new ArrayList<XRange>(); // collection of x values.   
+  private ArrayList<XRange> xRanges; // collection of x values.   
   public ArrayList<Integer> scale;
   public int channel = 0;
   public int velocity = 127;
@@ -18,6 +18,13 @@ class MusicMaker
 
   public MusicMaker()
   {
+    // Instantiate lists
+     this.xRanges = new ArrayList<XRange>();
+     this.oldNLBs = new ArrayList<NoteLinkedBlob>();
+     this.newNLBs = new ArrayList<NoteLinkedBlob>();
+     this.toPlayNLBs = new ArrayList<NoteLinkedBlob>();
+     this.toStopNLBs = new ArrayList<NoteLinkedBlob>();
+    
     midiBus = new MidiBus(this, -1, "Microsoft GS Wavetable Synth");
     setNoteMapLinear(10);
     this.scale = SCALE_SIMPLE;
@@ -76,16 +83,33 @@ class MusicMaker
     }
 
     // for each remaining new NLB
-    Iterator<NoteLinkedBlob> newNLBiter = this.newNLBs.iterator();
+    Iterator<NoteLinkedBlob> newNLBiter = this.newNLBs.iterator(); //<>//
     while (newNLBiter.hasNext())
     {
-      NoteLinkedBlob inspectedNewNLB = newNLBiter.next();
-
       // add to toPlay list unless note already there:
-      // copy item to toPlay List
-      toPlayNLBs.add(inspectedNewNLB);
-      // remove NLBs with name note (including inspected) from newNLBs
-      inspectedNewNLB.removeNLBsWithSameNoteFrom(this.newNLBs);
+      NoteLinkedBlob newNLB = newNLBiter.next();
+      
+      boolean foundAMatch = false; // begin asserting that newNLB has no similar note in toPlayNLBs 
+      
+      // for each toPlayNLB
+      Iterator<NoteLinkedBlob> toPlayNLBiter = this.toPlayNLBs.iterator();
+      while(toPlayNLBiter.hasNext())
+      {
+        NoteLinkedBlob toPlayNLB = toPlayNLBiter.next();
+        
+        // if the newNLB matches the pitch of the toPlayNLB
+        if(newNLB.isSameNote(toPlayNLB))
+        {
+          foundAMatch = true; // assert that a match has been found
+          break; // Stop looking
+        }
+      }
+      
+      // If after scanning all the toPlayNLB's no match has been found
+      if(!foundAMatch)
+      {
+        toPlayNLBs.add(newNLB); // Add the newNLB to the toPlayNLBs list
+      }
     }
 
     // add toPlay NLBs to oldNLBs
@@ -146,8 +170,9 @@ class MusicMaker
     for (int xRangeIdx = 0; xRangeIdx < numNotes; xRangeIdx++) // for each xRange
     {
       int xMin = xRangeIdx * xRangeInterval;
-      int xMax = xRangeIdx+1 * xRangeInterval;
+      int xMax = (xRangeIdx + 1) * xRangeInterval;
       this.xRanges.add(new XRange(xMin, xMax)); // add that value to the noteMap
+      //println("interval: " + xRangeInterval + ", xMin: " + xMin + ", xMax: " + xMax);
     }
   }
 
@@ -168,6 +193,21 @@ class MusicMaker
       }
     }
     return(retNote);
+  }
+  
+  
+  
+  
+  
+  void drawXRanges()
+  {
+    for(XRange xRange : this.xRanges)
+    {
+      int x = xRange.xMax + FRAME_SINGLE_WIDTH;
+      stroke(255);
+      line(x, 0, x, FRAME_SINGLE_HEIGHT);
+
+    }
   }
 
 

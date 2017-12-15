@@ -89,6 +89,12 @@ void draw()
     // Draw blob identifiers
     dispCurrent(modImg);
     drawBlobsInPostFrame();
+    
+    // Draw xRanges
+    musicMaker.drawXRanges();
+    
+    // update notes from blobs
+    musicMaker.update(blobTracker.getNewBlobs());
   }
 }
 
