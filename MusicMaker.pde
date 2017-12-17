@@ -121,6 +121,23 @@ class MusicMaker
     }
   }
 
+  Note determineNoteFromLocation(Blob blob)
+  {
+    Note retNote = null;
+    for (int xRangeIdx = 0; xRangeIdx < xRanges.size(); xRangeIdx++) // for each xRange by index
+    {
+      XRange xRange = xRanges.get(xRangeIdx); // get the current xRange
+      if (xRange.contains(blob.x)) // if the blob is in this xRange
+      {
+        int octave = xRangeIdx / this.scale.size(); // determine octave above rootNote
+        int pitchIdx = xRangeIdx % this.scale.size(); // determine pitch index in scale
+        int pitch = this.rootNote + octave * 12 + this.scale.get(pitchIdx); // determine note pitch
+        retNote = new Note(channel, pitch, velocity);
+      }
+    }
+    return(retNote);
+  }
+
 
 
 
@@ -174,8 +191,6 @@ class MusicMaker
       return;
     }
 
-    int xRangeMax = 0; // start at x = 0
-
     for (int xRangeIdx = 0; xRangeIdx < numNotes; xRangeIdx++) // for each xRange
     {
       int xMin = xRangeIdx * xRangeInterval;
@@ -187,22 +202,7 @@ class MusicMaker
 
 
 
-  Note determineNoteFromLocation(Blob blob)
-  {
-    Note retNote = null;
-    for (int xRangeIdx = 0; xRangeIdx < xRanges.size(); xRangeIdx++) // for each xRange by index
-    {
-      XRange xRange = xRanges.get(xRangeIdx); // get the current xRange
-      if (xRange.contains(blob.x)) // if the blob is in this xRange
-      {
-        int octave = xRangeIdx / this.scale.size(); // determine octave above rootNote
-        int pitchIdx = xRangeIdx % this.scale.size(); // determine pitch index in scale
-        int pitch = this.rootNote + octave * 12 + this.scale.get(pitchIdx); // determine note pitch
-        retNote = new Note(channel, pitch, velocity);
-      }
-    }
-    return(retNote);
-  }
+
 
 
 
