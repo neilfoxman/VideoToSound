@@ -95,6 +95,9 @@ void draw()
     
     // update notes from blobs
     musicMaker.update(blobTracker.getNewBlobs());
+    
+    // play/stop notes
+    musicMaker.play();
   }
 }
 

@@ -90,7 +90,6 @@ class MusicMaker
       NoteLinkedBlob newNLB = newNLBiter.next();
       
       boolean foundAMatch = false; // begin asserting that newNLB has no similar note in toPlayNLBs 
-      
       // for each toPlayNLB
       Iterator<NoteLinkedBlob> toPlayNLBiter = this.toPlayNLBs.iterator();
       while(toPlayNLBiter.hasNext())
@@ -119,7 +118,6 @@ class MusicMaker
       NoteLinkedBlob inspectedToPlayNLB = toPlayNLBiter.next();
 
       oldNLBs.add(inspectedToPlayNLB);
-      toPlayNLBiter.remove();
     }
   }
   
@@ -134,17 +132,23 @@ class MusicMaker
   {
     // TODO: change cc
     
+    print("Stopping: ");
     // stop notes on toStop list
     for(NoteLinkedBlob nlb : this.toStopNLBs)
     {
+      print(nlb.note.pitch + ", ");
       midiBus.sendNoteOff(nlb.note);
     }
+    println();
     
+    print("Playing: ");
     // play notes on toPlay list
     for(NoteLinkedBlob nlb : this.toPlayNLBs)
     {
+      print(nlb.note.pitch + ", ");
       midiBus.sendNoteOn(nlb.note);
     }
+    println();
   }
 
 
