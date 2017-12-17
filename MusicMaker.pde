@@ -1,10 +1,8 @@
-
+ //<>//
 class MusicMaker
 {
   MidiBus midiBus;
   ArrayList<NoteLinkedBlob> oldNLBs, newNLBs, toPlayNLBs, toStopNLBs;
-
-
 
   public final ArrayList<Integer> SCALE_MAJOR = new ArrayList(Arrays.asList(0, 2, 4, 5, 7, 9, 11));
   public final ArrayList<Integer> SCALE_MINOR = new ArrayList(Arrays.asList(0, 2, 3, 5, 7, 8, 10));
@@ -19,23 +17,25 @@ class MusicMaker
   public MusicMaker()
   {
     // Instantiate lists
-     this.xRanges = new ArrayList<XRange>();
-     this.oldNLBs = new ArrayList<NoteLinkedBlob>();
-     this.newNLBs = new ArrayList<NoteLinkedBlob>();
-     this.toPlayNLBs = new ArrayList<NoteLinkedBlob>();
-     this.toStopNLBs = new ArrayList<NoteLinkedBlob>();
-    
-    midiBus = new MidiBus(this, -1, "Microsoft GS Wavetable Synth");
-    setNoteMapLinear(10);
+    this.xRanges = new ArrayList<XRange>();
+    this.oldNLBs = new ArrayList<NoteLinkedBlob>();
+    this.newNLBs = new ArrayList<NoteLinkedBlob>();
+    this.toPlayNLBs = new ArrayList<NoteLinkedBlob>();
+    this.toStopNLBs = new ArrayList<NoteLinkedBlob>();
+
+    MidiBus.list();
+    //midiBus = new MidiBus(this, -1, "Microsoft GS Wavetable Synth");
+    midiBus = new MidiBus(this, -1, "loopMIDI Port");
+    setNoteMapLinear(20);
     this.scale = SCALE_SIMPLE;
   }
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
   // gets notes for each new blob, handles blob translation into NoteLinkedBlob, NLB birth, NLB movement, and NLB death
   void update(ArrayList<Blob> blobs)
   {
@@ -83,29 +83,29 @@ class MusicMaker
     }
 
     // for each remaining new NLB
-    Iterator<NoteLinkedBlob> newNLBiter = this.newNLBs.iterator(); //<>//
+    Iterator<NoteLinkedBlob> newNLBiter = this.newNLBs.iterator();
     while (newNLBiter.hasNext())
     {
       // add to toPlay list unless note already there:
       NoteLinkedBlob newNLB = newNLBiter.next();
-      
+
       boolean foundAMatch = false; // begin asserting that newNLB has no similar note in toPlayNLBs 
       // for each toPlayNLB
       Iterator<NoteLinkedBlob> toPlayNLBiter = this.toPlayNLBs.iterator();
-      while(toPlayNLBiter.hasNext())
+      while (toPlayNLBiter.hasNext())
       {
         NoteLinkedBlob toPlayNLB = toPlayNLBiter.next();
-        
+
         // if the newNLB matches the pitch of the toPlayNLB
-        if(newNLB.isSameNote(toPlayNLB))
+        if (newNLB.isSameNote(toPlayNLB))
         {
           foundAMatch = true; // assert that a match has been found
           break; // Stop looking
         }
       }
-      
+
       // If after scanning all the toPlayNLB's no match has been found
-      if(!foundAMatch)
+      if (!foundAMatch)
       {
         toPlayNLBs.add(newNLB); // Add the newNLB to the toPlayNLBs list
       }
@@ -120,35 +120,40 @@ class MusicMaker
       oldNLBs.add(inspectedToPlayNLB);
     }
   }
-  
-  
-  
-  
-  
-  
-  
+
+
+
+
+
+
+
   // looks at NLB's stored on list and plays, stops, or changes Notes
   void play()
   {
     // TODO: change cc
-    
-    print("Stopping: ");
+
     // stop notes on toStop list
-    for(NoteLinkedBlob nlb : this.toStopNLBs)
+    for (NoteLinkedBlob nlb : this.toStopNLBs)
     {
-      print(nlb.note.pitch + ", ");
       midiBus.sendNoteOff(nlb.note);
     }
-    println();
-    
-    print("Playing: ");
+
     // play notes on toPlay list
-    for(NoteLinkedBlob nlb : this.toPlayNLBs)
+    for (NoteLinkedBlob nlb : this.toPlayNLBs)
     {
-      print(nlb.note.pitch + ", ");
       midiBus.sendNoteOn(nlb.note);
     }
-    println();
+  }
+
+
+  void sendAllNotesOff()
+  {
+    //https://www.midi.org/specifications/item/table-1-summary-of-midi-message
+    int status = channel | Integer.parseInt("1011", 2)<<4;
+    //println(Integer.toBinaryString(status));
+    int c = 123;
+    int v = 0;
+    midiBus.sendMessage(status, c, v);
   }
 
 
@@ -163,12 +168,12 @@ class MusicMaker
 
     this.xRanges.clear();// clear previous map of note ranges
     int xRangeInterval = FRAME_SINGLE_WIDTH / numNotes; // choose interval between X to make note cutoff
-    if(xRangeInterval == 0)
+    if (xRangeInterval == 0)
     {
       println("improper number of notes");
       return;
     }
-    
+
     int xRangeMax = 0; // start at x = 0
 
     for (int xRangeIdx = 0; xRangeIdx < numNotes; xRangeIdx++) // for each xRange
@@ -198,19 +203,18 @@ class MusicMaker
     }
     return(retNote);
   }
-  
-  
-  
-  
-  
+
+
+
+
+
   void drawXRanges()
   {
-    for(XRange xRange : this.xRanges)
+    for (XRange xRange : this.xRanges)
     {
       int x = xRange.xMax + FRAME_SINGLE_WIDTH;
       stroke(255);
       line(x, 0, x, FRAME_SINGLE_HEIGHT);
-
     }
   }
 
@@ -340,27 +344,26 @@ class MusicMaker
      When iterating through xRanges, if a blob's x value is less than a given value, but above all the previous values,
      then it resides in 
      */
-     public int xMin, xMax;
+    public int xMin, xMax;
 
     public XRange(int _xMin, int _xMax)
     {
       this.xMin = _xMin;
       this.xMax = _xMax;
     }
-    
+
     // Check if value is in xRange (left inclusive)
     public boolean contains(int xVal)
     {
       boolean retBool = false;
-      if(xVal < this.xMax)
+      if (xVal < this.xMax)
       {
-        if(xVal >= this.xMin)
+        if (xVal >= this.xMin)
         {
           retBool = true;
         }
       }
       return(retBool);
     }
-    
   }
 }

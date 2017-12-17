@@ -20,7 +20,7 @@ final int FRAME_SINGLE_WIDTH = ASP_WIDTH * ASP_SCALE;
 final int FRAME_SINGLE_HEIGHT = ASP_HEIGHT * ASP_SCALE;
 
 // Fixed Threshold parameters
-int lightThreshold = 240;
+int lightThreshold = 200;
 
 // Blob tracker
 BlobTracker blobTracker;
@@ -40,7 +40,8 @@ void setup() {
   surface.setSize(FRAME_SINGLE_WIDTH * 2, FRAME_SINGLE_HEIGHT); // programatic resize requires this
 
   // Create manipulation objects
-  video = new Movie(this, "2017_1114_184929_016.MOV");
+  //video = new Movie(this, "2017_1114_184929_016.MOV");
+  video = new Movie(this, "2017_1114_184629_015.MOV");
   blobTracker = new BlobTracker(this);
   //opencv = new OpenCV(this, FRAME_SINGLE_WIDTH, FRAME_SINGLE_HEIGHT);
   musicMaker = new MusicMaker();
@@ -50,7 +51,7 @@ void setup() {
   video.loop();
   video.frameRate(fRate);
   video.volume(0);
-  //video.speed(0.1);
+  video.speed(0.1);
   video.play();
   //video.jump(frame);
   //video.pause();
@@ -129,4 +130,11 @@ void mousePressed() {
   video.jump(fr);
   video.pause();
   //println("jumped to " + video.time());
+}
+
+void exit()
+{
+  //println("Stopping");
+  musicMaker.sendAllNotesOff();
+  super.exit(); // https://stackoverflow.com/questions/28671706/processing-and-stop-method
 }
