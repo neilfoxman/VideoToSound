@@ -3,6 +3,7 @@ class Blob
   private PApplet parent;
   public Contour contour;
   public int x, y;
+  public int deathCounter = 5; // number of frames after which the blob will be removed if not found
   
   // Blob Tracking
   public int tempId, finalId;
@@ -22,6 +23,19 @@ class Blob
     Rectangle r = contour.getBoundingBox();
     this.x = r.x + r.width/2;
     this.y = r.y + r.height/2;
+  }
+  
+  // Updates this blob with parameters of another blob
+  public void update(Blob newBlob)
+  {
+    this.finalId = newBlob.finalId;
+    this.x = newBlob.x;
+    this.y = newBlob.y;
+    this.contour = newBlob.contour;
+  }
+  
+  private void getLocationFromContour(Contour _contour)
+  {
   }
 
   // Get distance between this blob and another

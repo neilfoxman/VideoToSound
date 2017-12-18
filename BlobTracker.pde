@@ -26,14 +26,20 @@ class BlobTracker
     
     //println("***********************************");
     
-    // Clear out old blobs
-    this.oldBlobs.clear();
-    
-    // Copy any previous newBlobs to oldBlob list, they are now used as the oldBlobs for tracking
-    for(Blob newBlob : this.newBlobs)// for each newBlob
+    // Clear out old blobs that have died
+    // For each old Blob
+    Iterator<Blob> oldBlobIter = this.oldBlobs.iterator();
+    while(oldBlobIter.hasNext())
     {
-      this.oldBlobs.add(newBlob);// add each newBlob to the List of OldBlobs
+      Blob oldBlob = oldBlobIter.next();
+      
+      if(oldBlob.deathCounter < 0) // if the oldBlob has died
+      {
+        oldBlobIter.remove(); // remove it from the list
+      }
     }
+    
+    
     
     // clear out newBlobs list.  When we scan the image, we will put the blobs in the newBlob list
     this.newBlobs.clear();
@@ -52,6 +58,8 @@ class BlobTracker
       newBlob.tempId = ++idCounter;
       this.newBlobs.add(newBlob);
     }
+    
+    
 
     // If we have old blobs that we have previously tracked
     if (!this.oldBlobs.isEmpty())
@@ -70,9 +78,10 @@ class BlobTracker
         newBlob.calculateClosestBlob(this.oldBlobs);
       }      
       
-      
+      // determine if oldBlob has a matching newBlob
       for (Blob inspectedOldBlob : this.oldBlobs) // inspect each old blob
       {
+        
         //  get closest newblob to inspected oldblob
         Blob closestNewBlob = inspectedOldBlob.closestBlob;
 
@@ -82,17 +91,28 @@ class BlobTracker
         //print("inspectedOldBlob: " + inspectedOldBlob.finalId + " (" + inspectedOldBlob.tempId + ") closestBlobDist: " + String.format("%.2g",inspectedOldBlob.closestBlobDist));
         //print("\t| closestNewBlob: " + closestNewBlob.finalId + " (" + closestNewBlob.tempId + ")");
         //println("\t| closestOldBlob_closestNewBlob: " + closestOldBlob_closestNewBlob.finalId + " (" + closestOldBlob_closestNewBlob.tempId + ")");
-
+        
+        boolean matchFound = false; // Assert that a matching newBlob has not been found yet
+        
         //  if inspected oldBlob is the closest oldBlob to its closest newBlob
         if (inspectedOldBlob.finalId == closestOldBlob_closestNewBlob.finalId)
         {
           // if distance is less than threshold
           if (inspectedOldBlob.closestBlobDist < trackDistanceThreshold)
           {
-            // Assign the newblob the same final id as the inspected and closest oldBlob
-            closestNewBlob.finalId = inspectedOldBlob.finalId;
-            //println("closestNewBlob "+closestNewBlob.finalId+"  inspectedOldBlob:"+inspectedOldBlob.finalId);
+            //// Assign the newblob the same final id as the inspected and closest oldBlob
+            //closestNewBlob.finalId = inspectedOldBlob.finalId;
+            ////println("closestNewBlob "+closestNewBlob.finalId+"  inspectedOldBlob:"+inspectedOldBlob.finalId);
+            
+            inspectedOldBlob.update(closestNewBlob); // update the oldBlob with the closest newBlob info
+            
+            matchFound = true; // assert that a matching blob has been found
           }
+        }
+        
+        if(!matchFound) // if a matching newBlob has not been found
+        {
+          inspectedOldBlob.deathCounter--; // decrement the death counter
         }
       }
     }
@@ -104,20 +124,22 @@ class BlobTracker
       {
         newBlob.finalId = newBlob.tempId;// copy its tempId to its finalId
       }
+      
+      this.oldBlobs.add(newBlob); // add to the oldBlobs List
     }
     
     //println(); //<>//
     
   }
-
-  public ArrayList<Blob> getNewBlobs()
-  {
-    return(this.newBlobs);
-  }
   
-  public ArrayList<Blob> getOldBlobs()
+  public ArrayList<Blob> getBlobs()
   {
     return(this.oldBlobs);
+  }
+  
+  public ArrayList<Blob> getNewBlobsOnly()
+  {
+    return(this.newBlobs);
   }
   
 }

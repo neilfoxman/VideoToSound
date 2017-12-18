@@ -95,7 +95,7 @@ void draw()
     musicMaker.drawXRanges();
     
     // update notes from blobs
-    musicMaker.update(blobTracker.getNewBlobs());
+    musicMaker.update(blobTracker.getBlobs());
     
     // play/stop notes
     musicMaker.play();
@@ -117,10 +117,11 @@ void dispCurrent(PImage current)
 
 void drawBlobsInPostFrame()
 {
-  ArrayList<Blob> arrayOfBlobs = blobTracker.getNewBlobs();
+  ArrayList<Blob> arrayOfBlobs = blobTracker.getNewBlobsOnly();
   for (Blob blob : arrayOfBlobs)
   {
-    text(blob.finalId+","+blob.x+ ","+blob.y, blob.x + FRAME_SINGLE_WIDTH, blob.y);
+    //text(blob.finalId+","+blob.x+ ","+blob.y, blob.x + FRAME_SINGLE_WIDTH, blob.y);
+    text(blob.finalId, blob.x + FRAME_SINGLE_WIDTH, blob.y);
   }
 }
 
