@@ -20,7 +20,7 @@ final int FRAME_SINGLE_WIDTH = ASP_WIDTH * ASP_SCALE;
 final int FRAME_SINGLE_HEIGHT = ASP_HEIGHT * ASP_SCALE;
 
 // Fixed Threshold parameters
-int lightThreshold = 200;
+int lightThreshold = 250;
 
 // Blob tracker
 BlobTracker blobTracker;
@@ -51,7 +51,7 @@ void setup() {
   video.loop();
   video.frameRate(fRate);
   video.volume(0);
-  video.speed(0.1);
+  video.speed(1);
   video.play();
   //video.jump(frame);
   //video.pause();

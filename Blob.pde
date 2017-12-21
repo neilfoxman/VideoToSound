@@ -3,7 +3,7 @@ class Blob
   private PApplet parent;
   public Contour contour;
   public int x, y;
-  public int deathCounter = 5; // number of frames after which the blob will be removed if not found
+  public int deathCounter = 50; // number of frames after which the blob will be removed if not found, removes flicker
 
   // Blob Tracking
   public int tempId, finalId;
